@@ -21,6 +21,19 @@ class PuzzlPage extends StatefulWidget {
 
 class _PuzzlPageState extends State<PuzzlPage> {
   double size;
+
+  Map<int, List<int>> availablePositions = {
+    0: [1, 3],
+    1: [0, 2, 4],
+    2: [1, 5],
+    3: [0, 6, 4],
+    4: [1, 3, 5, 7],
+    5: [2, 4, 8],
+    6: [3, 7],
+    7: [6, 4, 8],
+    8: [5, 7]
+  };
+
   List<int> numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   @override
@@ -51,10 +64,13 @@ class _PuzzlPageState extends State<PuzzlPage> {
               child: Stack(children: _getChildren()),
             ),
             RaisedButton(
-                child: Text('SHUFFLE ME', style: TextStyle(fontSize: 20),),
-                onPressed: () => setState((){
-                  numbers.shuffle();
-                }),
+              child: Text(
+                'SHUFFLE ME',
+                style: TextStyle(fontSize: 20),
+              ),
+              onPressed: () => setState(() {
+                numbers.shuffle();
+              }),
             )
           ],
         ),
@@ -65,19 +81,20 @@ class _PuzzlPageState extends State<PuzzlPage> {
   List<Widget> _getChildren() {
     return numbers
         .map((numberInt) => Align(
-      alignment: _calculateAlignmentForIndex(numbers.indexOf(numberInt)),
-                child: Number(
+            alignment: _calculateAlignmentForIndex(numbers.indexOf(numberInt)),
+            child: Number(
+              onTap: () => _onNumberTaped(numberInt),
               number: numberInt,
               size: size / 3,
             )))
         .toList();
   }
 
-  _calculateAlignmentForIndex(int index) {
+  Alignment _calculateAlignmentForIndex(int index) {
     double x, y;
-    if (index <=2) {
+    if (index <= 2) {
       y = -1;
-    } else if (index <=5) {
+    } else if (index <= 5) {
       y = 0;
     } else {
       y = 1;
@@ -95,28 +112,61 @@ class _PuzzlPageState extends State<PuzzlPage> {
 
     return Alignment(x, y);
   }
+
+  // [1,2,3,4,5,6,7,8,9]
+  // 6 je na index-u 5
+  // 9 je na index-u 8
+  // izbacimo ih
+  // [1,2,3,4,5,6,7,8,9]
+
+  _onNumberTaped(int selectedNumber) {
+    var selectedIndex = numbers.indexOf(selectedNumber);
+    var indexOfNine = numbers.indexOf(9);
+    bool canChange = availablePositions[indexOfNine].contains(selectedIndex);
+    if (canChange) {
+      setState(() {
+        numbers.remove(9);
+        numbers.remove(selectedNumber);
+        if (indexOfNine < selectedIndex) {
+          numbers.insert(indexOfNine, selectedNumber);
+          numbers.insert(selectedIndex, 9);
+        } else {
+          numbers.insert(selectedIndex, 9);
+          numbers.insert(indexOfNine, selectedNumber);
+        }
+      });
+    }
+  }
 }
 
 class Number extends StatelessWidget {
   final double size;
   final int number;
+  final VoidCallback onTap;
 
-  const Number({Key key, this.size, this.number}) : super(key: key);
+  const Number({Key key, this.size, this.number, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(border: Border.all()),
-      child: number == 9
-          ? Container()
-          : Center(
-              child: Text(
-                number.toString(),
-                style: TextStyle(fontSize: 35),
+    var is9 = number == 9;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: is9 ? null : onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+            border: Border.all(),
+            color: is9 ? Colors.orange : Colors.transparent),
+        child: is9
+            ? Container()
+            : Center(
+                child: Text(
+                  number.toString(),
+                  style: TextStyle(fontSize: 35),
+                ),
               ),
-            ),
+      ),
     );
   }
 }
