@@ -41,13 +41,22 @@ class _PuzzlPageState extends State<PuzzlPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Container(
-            width: size ?? 0,
-            height: size ?? 0,
-            color: Colors.yellow,
-            child: Stack(children: _getChildren()),
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Container(
+              width: size ?? 0,
+              height: size ?? 0,
+              color: Colors.yellow,
+              child: Stack(children: _getChildren()),
+            ),
+            RaisedButton(
+                child: Text('SHUFFLE ME', style: TextStyle(fontSize: 20),),
+                onPressed: () => setState((){
+                  numbers.shuffle();
+                }),
+            )
+          ],
         ),
       ),
     );
