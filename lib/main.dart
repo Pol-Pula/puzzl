@@ -60,7 +60,10 @@ class _PuzzlPageState extends State<PuzzlPage> {
             Container(
               width: size ?? 0,
               height: size ?? 0,
-              color: Colors.yellow,
+              decoration: BoxDecoration(
+                border: Border.all(width: 2),
+                color: Colors.orange,
+              ),
               child: Stack(children: _getChildren()),
             ),
             RaisedButton(
@@ -117,7 +120,7 @@ class _PuzzlPageState extends State<PuzzlPage> {
   // 6 je na index-u 5
   // 9 je na index-u 8
   // izbacimo ih
-  // [1,2,3,4,5,6,7,8,9]
+  // [1,2,3,4,5,7,8]
 
   _onNumberTaped(int selectedNumber) {
     var selectedIndex = numbers.indexOf(selectedNumber);
@@ -156,8 +159,8 @@ class Number extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-            border: Border.all(),
-            color: is9 ? Colors.orange : Colors.transparent),
+            border: is9 ? null : Border.all(),
+            color: is9 ? Colors.transparent : Colors.yellow),
         child: is9
             ? Container()
             : Center(
